@@ -8,6 +8,7 @@ export default class GameController {
 
     this.state = 'start'; // start | playing | paused | over
     this.hi = parseInt(localStorage.getItem('tetris_hi') || '0');
+    this.newRecord = false;
 
     this._lastTick = 0;
     this._rafId = null;
@@ -28,6 +29,7 @@ export default class GameController {
     const startBtn   = document.getElementById('start-btn');
     const resumeBtn  = document.getElementById('resume-btn');
     const restartBtn = document.getElementById('restart-btn');
+    const homeBtn    = document.getElementById('home-btn');
 
     if (startBtn) {
       startBtn.onclick = () => this.startGame();
@@ -38,7 +40,11 @@ export default class GameController {
     }
 
     if (restartBtn) {
-      restartBtn.onclick = () => this.startGame();
+      restartBtn.onclick = () => this.restartGame();
+    }
+
+    if (homeBtn) {
+      homeBtn.onclick = () => this._returnToMenu();
     }
   }
 
@@ -46,16 +52,40 @@ export default class GameController {
   // GAME FLOW
   // ─────────────────────────────
   startGame() {
+    if (this.state === 'playing') return;
+
     this.model.reset();
     this.state = 'playing';
+    this.newRecord = false;
 
     this.view.hideAll();
+
+    this._syncView();
 
     this._dropAcc = 0;
     this._lastTick = performance.now();
 
     if (this._rafId) cancelAnimationFrame(this._rafId);
     this._loop(this._lastTick);
+  }
+
+  restartGame() {
+    if (this.state !== 'over') return;
+    this.startGame();
+  }
+
+  _returnToMenu() {
+    this.stopGame();
+    this.view.showStart();
+  }
+
+  stopGame() {
+    if (this.state === 'over') return;
+
+    this.state = 'over';
+    if (this._rafId) cancelAnimationFrame(this._rafId);
+    this._updateHighScore();
+    this.view.showGameOver(this.model.score, this.hi, this.newRecord);
   }
 
   pause() {
@@ -78,15 +108,19 @@ export default class GameController {
 
   _checkGameOver() {
     if (this.model.gameOver) {
-      this.state = 'over';
-      cancelAnimationFrame(this._rafId);
+      this.handleGameOver();
+    }
+  }
 
-      if (this.model.score > this.hi) {
-        this.hi = this.model.score;
-        localStorage.setItem('tetris_hi', this.hi);
-      }
+  handleGameOver() {
+    this.stopGame();
+  }
 
-      this.view.showGameOver(this.model.score);
+  _updateHighScore() {
+    if (this.model.score > this.hi) {
+      this.hi = this.model.score;
+      localStorage.setItem('tetris_hi', this.hi);
+      this.newRecord = true;
     }
   }
 

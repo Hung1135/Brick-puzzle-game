@@ -163,6 +163,14 @@
     letter-spacing: .1em;
   }
 
+  .new-record {
+    display: block;
+    margin-top: 8px;
+    color: var(--accent2);
+    font-weight: 700;
+    text-shadow: var(--glow2);
+  }
+
   .btn {
     font-family: 'Orbitron', sans-serif;
     font-size: .75rem;

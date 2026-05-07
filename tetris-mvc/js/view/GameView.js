@@ -115,9 +115,12 @@ export default class GameView {
     this.hiEl.textContent = hi.toLocaleString();
   }
 
-  // ─────────────────────────────
-  // UI STATES
-  // ─────────────────────────────
+  flashLevelUp() {
+    this.levelEl.classList.add('level-up');
+    setTimeout(() => this.levelEl.classList.remove('level-up'), 300);
+  }
+
+
   showStart() {
     this._showOnly('start-screen');
   }
@@ -126,9 +129,12 @@ export default class GameView {
     this._showOnly('pause-screen');
   }
 
-  showGameOver(score) {
+  showGameOver(score, hi, newRecord) {
     if (this.finalEl) {
-      this.finalEl.textContent = `SCORE: ${score}`;
+      this.finalEl.innerHTML = `SCORE: ${score}` + (newRecord ? '<br><span class="new-record">NEW RECORD!</span>' : '');
+    }
+    if (this.hiEl) {
+      this.hiEl.textContent = hi.toLocaleString();
     }
     this._showOnly('gameover-screen');
   }
