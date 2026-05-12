@@ -20,3 +20,9 @@ body {
     position: relative;
 
     }
+.score-board {    position: absolute;
+    top: 10px;
+    left: 10px;
+    color: #fff;
+    font-size: 18px;
+    }
